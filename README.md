@@ -1,0 +1,1 @@
+Test LFS removal success
