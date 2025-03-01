@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+  directUrl    = env("DATABASE_URL")
+}
+
+model User {
+  id            Int            @id @default(autoincrement())
+  email         String         @unique
+  password      String
+  name          String?
+  usageRecords  UsageRecord[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model UsageRecord {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id])
+  type      String    // 'ai-card', 'hot-post', 'image-card'
+  remaining Int       // 剩余次数
+  content   String?   @db.Text  // 使用 Text 类型
+  imageUrl  String?   @db.Text  // 使用 Text 类型存储长 URL
+  status    String?   @db.VarChar(50)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([userId, type])
+  @@index([userId])
+}
+
+enum Role {
+  USER
+  ADMIN
+}
